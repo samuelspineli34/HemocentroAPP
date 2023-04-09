@@ -45,6 +45,9 @@ dependencies:
   flutter_bloc: ^8.0.1
   equatable: ^2.0.3
 
+  http: ^0.13.5
+  carousel_slider: ^4.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

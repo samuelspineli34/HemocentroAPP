@@ -1,39 +1,121 @@
 import 'package:flutter/material.dart';
-import 'center_page.dart';
-import 'crudBD.dart';
-import 'utils.dart';
-import 'add_instance_button.dart';
+import 'services/remote_service.dart';
+import 'models/post.dart';
 
-void main() {
-  runApp(const MaterialApp(home: MyApp(), debugShowCheckedModeBanner: false,));
+import 'package:carousel_slider/carousel_slider.dart';
+
+
+void main(){
+  runApp(const MyApp());
 }
 
-/// Função que roda a home na main, esse widget deve ser stateful já que
-/// o estado muda nas páginas de user e homepage.
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key,}) : super(key: key);
+class MyApp extends StatelessWidget{
+
+  const MyApp({Key? key}) : super(key: key);
 
   @override
-  HomePage createState() => HomePage(); // Estado da primeira Página (Home Page do aplicativo).
-}
-
-// Página Inicial, appbar, menu, user, bottombar.
-class HomePage extends State<MyApp> {
-
-  @override
-  initState() {
-    listarBancos();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      drawer: NavigationDrawerWidget(), // função que chama o drawer estilizado.
-      appBar: DefaultAppBar(), // função que chama a appBar estilizada.
-      body: centerScreen(), // função que retorna o pageview e as páginas listadas
-      floatingActionButton: AddInstanceButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+  Widget build(BuildContext context){
+    return MaterialApp(
+      title: 'Flutter demo',
+      home: const HomePage(),
     );
   }
+}
+
+class HomePage extends StatefulWidget{
+  const HomePage({Key? key}) : super (key : key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+
+}
+
+
+
+class _HomePageState extends State<HomePage> {
+
+  List<Post>? posts;
+  var isLoaded = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    getData();
+  }
+
+  getData() async {
+    posts = await RemoteService().getPosts();
+    if(posts != null) {
+      setState(() {
+        isLoaded = true;
+      });
+    }
+  }
+
+  List<Widget> toListWidget(){
+    final widgets = List<Widget>.filled(posts!.length, SizedBox.shrink());
+
+
+    for(int i=0; i < posts!.length; i++) {
+      widgets[i] = new Container(
+        child: ListView(
+          children: [
+            Title(
+              color: Colors.blueGrey,
+              child: Text(posts![i].title),
+            ),
+            Image(
+              image: NetworkImage(posts![i].thumbnailUrl),
+            ),
+          ],
+        ),
+      );
+    }
+    return widgets;
+  }
+
+
+
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Posts"),
+      ),
+      body: Column(
+        children:[
+          Visibility(
+            visible: isLoaded,
+            replacement: const Center(
+              child: CircularProgressIndicator(),
+            ),
+            child: CarouselSlider(
+              options: CarouselOptions(height: 400.0),
+              items: toListWidget(),
+            ),
+          ),
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {},
+                child: const Text('Login'),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () {},
+                child: const Text('Registrar'),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+    );
+
+
+
+  }
+
 }
