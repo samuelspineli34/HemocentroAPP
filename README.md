@@ -1,4 +1,4 @@
-# Hemocentro Pika
+# Hemocentro
 
 ## Flutter Project for Laboratório de Desenvolvimento para Dispositivos Móveis.
 
